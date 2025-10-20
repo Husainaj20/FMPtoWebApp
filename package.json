@@ -1,0 +1,26 @@
+{
+  "name": "fmptoweb",
+  "version": "1.0.0",
+  "description": "Government project management dashboard static site",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/kill-ports.js 4000",
+    "dev": "NODE_ENV=development node --watch server/index.js",
+    "start": "node server/index.js",
+    "clean": "rm -rf node_modules package-lock.json",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
+  },
+  "devDependencies": {
+    "eslint": "^9.11.1",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
