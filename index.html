@@ -400,6 +400,18 @@
       <!-- 🔹 Project grid -->
       <div id="grid" class="grid"></div>
 
+      <!-- 🔹 Pagination controls -->
+      <div
+        id="pagination"
+        class="pagination"
+        style="display: none"
+        aria-label="Project list pagination"
+      >
+        <button id="prevPage" class="btn btn-secondary" aria-label="Previous page">Prev</button>
+        <span id="pageInfo" class="page-info" aria-live="polite" style="margin: 0 12px"></span>
+        <button id="nextPage" class="btn btn-secondary" aria-label="Next page">Next</button>
+      </div>
+
       <div id="empty" class="empty" style="display: none">
         <div class="empty-state">
           <svg

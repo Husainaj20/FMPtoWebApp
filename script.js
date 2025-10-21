@@ -8,6 +8,52 @@ var apiOnline = false; // toggled by API status checker
 // Navigation state
 var filterHistory = [];
 var savedFilters = [];
+// Pagination state
+var currentProjectsPage = 1;
+var pageSize = 8; // default items per page
+var totalCount = 0;
+
+function updatePaginationUI(total, page, limit) {
+  var pagination = document.getElementById("pagination");
+  var prevBtn = document.getElementById("prevPage");
+  var nextBtn = document.getElementById("nextPage");
+  var pageInfo = document.getElementById("pageInfo");
+
+  var totalPages = Math.max(1, Math.ceil((total || 0) / (limit || pageSize)));
+
+  if (!pagination || !prevBtn || !nextBtn || !pageInfo) return;
+
+  if (totalPages <= 1) {
+    pagination.style.display = "none";
+    return;
+  }
+
+  pagination.style.display = "flex";
+  pageInfo.textContent = "Page " + page + " of " + totalPages;
+  prevBtn.disabled = page <= 1;
+  nextBtn.disabled = page >= totalPages;
+}
+
+function initPaginationControls() {
+  var prevBtn = document.getElementById("prevPage");
+  var nextBtn = document.getElementById("nextPage");
+  if (prevBtn) {
+    prevBtn.addEventListener("click", function () {
+      if (currentProjectsPage > 1) {
+        currentProjectsPage -= 1;
+        updateFilter();
+      }
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function () {
+      currentProjectsPage += 1; // capped by updatePaginationUI disable
+      updateFilter();
+    });
+  }
+}
+
+initPaginationControls();
 
 (function () {
   // --- Backend status check ---
@@ -601,6 +647,8 @@ var savedFilters = [];
   // Update filter function to include search and server fetch
   async function updateFilter() {
     var filteredProjects = projects;
+    var serverTotal = null;
+    var serverLimit = pageSize;
 
     // If API is online, fetch server-side filtered projects first
     if (apiOnline) {
@@ -608,6 +656,8 @@ var savedFilters = [];
         var params = new URLSearchParams();
         if (currentFilter) params.set("status", currentFilter);
         if (currentSearchTerm) params.set("q", currentSearchTerm);
+        if (currentProjectsPage) params.set("page", String(currentProjectsPage));
+        if (pageSize) params.set("limit", String(pageSize));
         var url = "/api/projects" + (params.toString() ? "?" + params.toString() : "");
         if (empty) {
           empty.style.display = "";
@@ -620,6 +670,8 @@ var savedFilters = [];
             projects = json.items;
             window.projects = projects;
             filteredProjects = projects;
+            if (typeof json.total === "number") serverTotal = json.total;
+            if (typeof json.limit === "number") serverLimit = json.limit;
           }
         }
       } catch (e) {
@@ -660,8 +712,25 @@ var savedFilters = [];
       });
     }
 
-    // Update project count in top card (exactly like original)
-    activeSummary.textContent = filteredProjects.length;
+    // Determine total count for pagination and summary
+    if (apiOnline && serverTotal != null) {
+      totalCount = serverTotal;
+    } else {
+      totalCount = filteredProjects.length;
+    }
+
+    // Apply client-side pagination when using local data (or when server didn't paginate)
+    var toRender = filteredProjects;
+    if (!apiOnline || serverTotal == null) {
+      var start = (currentProjectsPage - 1) * pageSize;
+      toRender = filteredProjects.slice(start, start + pageSize);
+      updatePaginationUI(filteredProjects.length, currentProjectsPage, pageSize);
+    } else {
+      updatePaginationUI(totalCount, currentProjectsPage, serverLimit || pageSize);
+    }
+
+    // Update project count in top card with total
+    activeSummary.textContent = totalCount;
 
     // Update meta text based on filter status
     var metaEl = document.getElementById("projectsMeta");
@@ -673,7 +742,7 @@ var savedFilters = [];
     }
 
     // Update all components
-    renderProjectCards(filteredProjects);
+    renderProjectCards(toRender);
     updateTasksCard(filteredProjects);
     updateWheelState();
   }
