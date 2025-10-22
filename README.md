@@ -1,4 +1,4 @@
-# Gov App v3
+# FMPtoWeb Dashboard Prototype
 
 This repository contains a modernized prototype of a government project management dashboard. It now runs as a single server: Express serves the static frontend and the API from the same origin.
 
