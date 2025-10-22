@@ -10,7 +10,7 @@ var filterHistory = [];
 var savedFilters = [];
 // Pagination state
 var currentProjectsPage = 1;
-var pageSize = 8; // default items per page
+var pageSize = 12; // default items per page
 var totalCount = 0;
 
 function updatePaginationUI(total, page, limit) {

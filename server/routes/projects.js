@@ -17,10 +17,11 @@ function normalizeStatus(s) {
 
 router.get("/", (req, res) => {
   try {
-    const { status, q, page = "1", limit = "20" } = req.query;
+    const { status, q, page = "1", limit = "12" } = req.query;
     const normalized = normalizeStatus(status);
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+    // Default and maximum page size is 12 to match the UI requirement
+    const limitNum = Math.min(12, Math.max(1, parseInt(limit, 10) || 12));
 
     let items = allProjects.slice();
 
