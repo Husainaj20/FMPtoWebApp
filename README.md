@@ -43,3 +43,4 @@ npm run predev && npm run dev
 ## Contributing
 
 Pull requests are welcome. Keep changes focused on improving clarity, reliability, or enabling backend integration.
+Verification: this line was added to test the pre-commit hook (lint-staged + husky).
